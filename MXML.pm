@@ -3,7 +3,7 @@ package POE::Component::MXML;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 use Carp qw(croak);
 
@@ -109,18 +109,28 @@ POE::Component::MXML - Perl extension for parsing Minimal XML specs
 =head1 SYNOPSIS
 
   use POE::Component::MXML;
+  POE::Component::MXML->spawn(
+    Alias => 'nested_tag_mxml',
+    InputHandle => '<para>open<emph>nest</emph>close</para>',
+    Tag => 'Tag', # Event for <tag>content</tag>
+  );
+  POE::Session->create(
+    inline_states => {
+      _start => sub { $_[KERNEL]->post('nested_tag_mxml' => 'get_tag'); },
+      Tag => sub {
+        my ($tag_type,$tag_name,$tag_contents) = @{$_[ARG1]}[0..2];
+      }
+    }
+  );
 
 =head1 DESCRIPTION
 
-Stub documentation for POE::Component::MXML was created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
-
-Blah blah blah.
+MXML is a Minimalist XML, without frills such as CDATA, attributes or entities.
+Refer to http://www.docuverse.com/smldev/minxmlspec.html for a spec.
 
 =head1 AUTHOR
 
-A. U. Thor, a.u.thor@a.galaxy.far.far.away
+Jeff Goff, E<lt>drforr@pobox.comE<gt>
 
 =head1 SEE ALSO
 
